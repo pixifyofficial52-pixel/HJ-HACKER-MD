@@ -92,6 +92,14 @@ async function handleAntideleteCommand(sock, chatId, message, isAdmin, botData, 
     }
 
     saveAntideleteConfig(config);
+
+    // ✅ FIX: botData ko bhi sync karein taaki menu mein ✅ dikhe
+    if (botData) {
+        if (!botData.antiDelete) botData.antiDelete = {};
+        botData.antiDelete[userId] = config.enabled;
+        if (saveBotData) saveBotData();
+    }
+
     return sock.sendMessage(chatId, { text: `*Antidelete ${match === 'on' ? 'enabled' : 'disabled'}*` }, {quoted:message});
 }
 
