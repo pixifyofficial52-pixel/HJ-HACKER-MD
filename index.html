@@ -1,193 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HJ-HACKER | WhatsApp Bot Panel</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root { --primary: #6c63ff; --secondary: #8f5eff; --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; --muted: #94a3b8; --border: #334155; }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; }
-        .navbar { background: var(--card-bg); border-bottom: 1px solid var(--border); padding: 15px 0; }
-        .navbar-brand { font-weight: 800; color: var(--primary) !important; font-size: 1.5rem; }
-        .stats-container { display: flex; gap: 20px; margin-bottom: 20px; }
-        .stats-card { flex: 1; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 15px; padding: 20px; text-align: center; }
-        .post-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 15px; padding: 20px; margin-bottom: 20px; transition: 0.3s; }
-        .post-card:hover { transform: translateY(-5px); border-color: var(--primary); }
-        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--secondary)); border: none; font-weight: 700; border-radius: 10px; padding: 10px 20px; }
-        .btn-danger { background: #ef4444; border: none; border-radius: 10px; }
-        .console-body { background: #000; border-radius: 10px; height: 250px; overflow-y: auto; padding: 15px; font-family: monospace; font-size: 12px; color: #10b981; }
-        .hidden { display: none !important; }
-        .status-badge { padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 12px; }
-        .connected { background: #10b981; }
-        .disconnected { background: #ef4444; }
-        
-        /* Loading Bar Styles */
-        .progress-container { width: 100%; background-color: var(--border); border-radius: 10px; margin-top: 15px; display: none; }
-        .progress-bar { width: 0%; height: 10px; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 10px; transition: width 0.5s ease; }
-        .loading-text { font-size: 12px; color: var(--muted); margin-top: 5px; text-align: center; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HJ-HACKER MD — Generate Your Pairing Code</title>
+<meta name="description" content="Connect your WhatsApp to HJ-HACKER MD securely with a pairing code in seconds.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root{
+    --bg1:#0b2a24;--bg2:#134e3f;--bg3:#1f7a5c;
+    --card:rgba(255,255,255,.07);--card-border:rgba(255,255,255,.14);
+    --text:#f1f7f4;--muted:#b7cfc5;--lime:#c7f55a;--lime2:#e8ff9a;
+    --orange:#ff8a1f;--gold:#e0b13c;--danger:#ff5d5d;--ok:#3ddc84;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Poppins',system-ui,sans-serif;color:var(--text);min-height:100vh;
+    background:radial-gradient(1200px 700px at 80% 0%,rgba(80,200,140,.35),transparent 60%),
+               radial-gradient(900px 600px at 0% 100%,rgba(30,120,90,.5),transparent 60%),
+               linear-gradient(180deg,var(--bg1),var(--bg2) 45%,#0e3a30);}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.08);backdrop-filter:blur(8px)}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem;letter-spacing:.3px}
+  .brand img{width:38px;height:38px;border-radius:50%;border:2px solid var(--lime)}
+  .nav a.cta{background:#fff;color:#0b2a24;text-decoration:none;font-weight:600;padding:10px 18px;border-radius:12px;font-size:.9rem}
+  .wrap{max-width:980px;margin:0 auto;padding:56px 18px 80px}
+  .eyebrow{text-align:center;color:var(--lime);font-weight:600;font-size:.95rem}
+  h1{text-align:center;font-size:clamp(2rem,6vw,3.2rem);font-weight:800;margin:14px 0 10px;letter-spacing:-.5px}
+  .sub{text-align:center;color:var(--muted);font-size:1.02rem;margin-bottom:34px}
+  .card{background:var(--card);border:1px solid var(--card-border);border-radius:18px;padding:18px 20px;margin-bottom:14px;backdrop-filter:blur(10px);box-shadow:0 10px 40px rgba(0,0,0,.25)}
+  .row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .icon{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid var(--card-border);display:grid;place-items:center;color:var(--gold);font-size:1.1rem;flex:none}
+  .card h5{font-size:1rem;font-weight:700}
+  .card p{color:var(--muted);font-size:.9rem;margin-top:3px}
+  .grow{flex:1;min-width:180px}
+  .pill{margin-left:auto;background:linear-gradient(135deg,var(--orange),#ffb15c);color:#1b1b1b;border:none;font-weight:700;padding:11px 18px;border-radius:12px;font-family:inherit;font-size:.92rem;cursor:pointer}
+  .stats{display:flex;gap:16px;color:var(--muted);font-size:.85rem;margin-top:4px}
+  .stats b{color:var(--text)}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gold);margin-right:6px}
+  .dot.on{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+  .label{font-weight:700;font-size:.95rem;margin:22px 0 8px}
+  .field{display:flex;align-items:center;background:#fff;border-radius:14px;padding:0 16px;height:56px;color:#111}
+  .field i{color:#5e7d72;margin-right:10px}
+  .field input{flex:1;border:none;outline:none;font-family:inherit;font-size:1.05rem;color:#111;background:transparent;height:100%}
+  .hint{font-size:.8rem;color:var(--muted);margin:8px 0 18px}
+  .btn{width:100%;height:58px;border:none;border-radius:14px;font-family:inherit;font-size:1.05rem;font-weight:700;cursor:pointer;
+    background:linear-gradient(90deg,#d99a2e,#e6c14a);color:#2a2100;box-shadow:0 8px 30px rgba(230,193,74,.25);transition:.2s}
+  .btn:disabled{opacity:.6;cursor:not-allowed}
+  .btn.ghost{background:transparent;border:1px solid var(--card-border);color:var(--text);box-shadow:none;height:48px;font-size:.95rem}
+  .btn.danger{background:var(--danger);color:#fff;box-shadow:none;height:48px}
+  .codebox{margin-top:14px;border:1.5px dashed rgba(255,255,255,.28);border-radius:16px;padding:22px;text-align:center;color:var(--muted);font-size:.9rem;min-height:82px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(255,255,255,.03)}
+  .codebox .code{font-size:clamp(1.6rem,7vw,2.6rem);font-weight:800;letter-spacing:.2em;color:var(--lime2);font-family:ui-monospace,monospace}
+  .codebox .copy{background:rgba(255,255,255,.1);border:1px solid var(--card-border);color:var(--text);padding:8px 14px;border-radius:10px;font-family:inherit;cursor:pointer;font-size:.85rem}
+  .bar{height:6px;background:rgba(255,255,255,.12);border-radius:10px;overflow:hidden;width:100%;display:none}
+  .bar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--lime),var(--ok));transition:width .4s}
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:40px}
+  .step{background:var(--card);border:1px solid var(--card-border);border-radius:16px;padding:18px}
+  .step .n{width:34px;height:34px;border-radius:50%;background:rgba(199,245,90,.15);color:var(--lime);display:grid;place-items:center;font-weight:800;margin-bottom:10px}
+  .step h6{font-size:.95rem;font-weight:700;margin-bottom:4px}
+  .step p{font-size:.83rem;color:var(--muted)}
+  .badge{padding:5px 12px;border-radius:20px;font-weight:700;font-size:.75rem;background:var(--danger);color:#fff}
+  .badge.on{background:var(--ok);color:#052}
+  .console{background:#04120e;border-radius:12px;height:230px;overflow-y:auto;padding:14px;font-family:ui-monospace,monospace;font-size:12px;color:#5df0a0;border:1px solid rgba(255,255,255,.08)}
+  .hidden{display:none!important}
+  footer{text-align:center;color:var(--muted);font-size:.8rem;margin-top:50px}
+  footer a{color:var(--lime);text-decoration:none}
+</style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="#"><img src="https://i.ibb.co/cKn3SBVp/file-000000000ec082308b1fcfad7672387e.png" alt="HJ-HACKER Logo" style="width:40px;height:40px;border-radius:50%;margin-right:10px;border:2px solid var(--primary);">HJ-HACKER MD</a>
-            <a href="https://whatsapp.com/channel/0029Vb8U1NiHrDZlqZZuqr1s" target="_blank" class="btn btn-primary btn-sm"><i class="fab fa-whatsapp me-1"></i>CHANNEL</a>
-        </div>
-    </nav>
+<nav class="nav">
+  <div class="brand"><img src="https://i.ibb.co/cKn3SBVp/file-000000000ec082308b1fcfad7672387e.png" alt="HJ-HACKER MD">HJ-HACKER MD</div>
+  <a class="cta" href="https://whatsapp.com/channel/0029Vb8U1NiHrDZlqZZuqr1s" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> Channel</a>
+</nav>
 
-    <div class="container mt-4">
-        <div class="stats-container">
-            <div class="stats-card">
-                <h3 id="totalUsers">0</h3>
-                <p class="mb-0">TOTAL USERS</p>
-            </div>
-            <div class="stats-card">
-                <h3 id="totalActive">0</h3>
-                <p class="mb-0">TOTAL BOT ACTIVE</p>
-            </div>
-        </div>
+<main class="wrap">
+  <div class="eyebrow">WhatsApp automation system</div>
+  <h1>Generate Your Pairing Code</h1>
+  <p class="sub">Connect your WhatsApp account securely and quickly with HJ-HACKER MD.</p>
 
-        <div id="setupSection">
-            <div class="post-card">
-                <h5 class="mb-3"><i class="fas fa-plus-circle me-2"></i>CREATE BOT</h5>
-                <div class="input-group mb-3">
-                    <input type="text" id="userIdInput" class="form-control" placeholder="Enter Unique Bot Name (e.g., MyBot1)">
-                    <button class="btn btn-primary" onclick="selectUser()">CREATE / SELECT</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="userDashboard" class="hidden">
-            <div id="stage1">
-                <div class="post-card">
-                    <h5><i class="fas fa-link me-2"></i>PAIRING CODE</h5>
-                    <div class="mb-3">
-                        <label class="form-label">WhatsApp Number (with country code)</label>
-                        <input type="tel" class="form-control" id="pairNumber" placeholder="923001234567">
-                    </div>
-                    <button class="btn btn-primary w-100" id="pairBtn">GENERATE CODE</button>
-                    
-                    <!-- Live Loading Bar -->
-                    <div id="progressContainer" class="progress-container">
-                        <div id="progressBar" class="progress-bar"></div>
-                        <div class="loading-text">⏳ Connecting to WhatsApp... Please wait.</div>
-                    </div>
-
-                    <div id="pairingResult" class="mt-3 text-center h4 text-warning"></div>
-                </div>
-            </div>
-
-            <div id="stage2" class="hidden">
-                <div class="post-card d-flex justify-content-between align-items-center">
-                    <div>
-                        <span id="connectionStatus" class="status-badge disconnected">DISCONNECTED</span>
-                        <span class="ms-2" id="activeBotName"></span>
-                    </div>
-                    <button class="btn btn-danger btn-sm" id="logoutBtn">LOGOUT</button>
-                </div>
-                <div class="post-card">
-                    <h5><i class="fas fa-terminal me-2"></i>LIVE CONSOLE</h5>
-                    <div class="console-body" id="console"></div>
-                </div>
-            </div>
-        </div>
+  <div class="card">
+    <div class="row">
+      <div class="icon"><i class="fas fa-server"></i></div>
+      <div class="grow">
+        <h5>Server Status</h5>
+        <div class="stats"><span><span class="dot on"></span>Active bots: <b id="totalActive">0</b></span><span><i class="fas fa-users"></i> Users: <b id="totalUsers">0</b></span></div>
+      </div>
+      <button class="pill" type="button"><i class="fas fa-check"></i> Main Server</button>
     </div>
+  </div>
 
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-    <script>
-        const socket = io();
-        let currentUserId = null;
+  <div class="card">
+    <div class="row">
+      <div class="icon"><i class="fas fa-circle-info"></i></div>
+      <div class="grow">
+        <h5>Quick Setup</h5>
+        <p>Enter your WhatsApp number with the country code, generate the code, then open WhatsApp → Linked Devices → Link with phone number.</p>
+      </div>
+    </div>
+  </div>
 
-        function selectUser() {
-            const userId = document.getElementById('userIdInput').value.trim();
-            if (!userId) return alert('Enter a bot name');
-            currentUserId = userId;
-            socket.emit('set-user', userId);
-            document.getElementById('activeBotName').innerText = "Bot: " + userId;
-            document.getElementById('userDashboard').classList.remove('hidden');
-            document.getElementById('stage1').classList.remove('hidden');
-            document.getElementById('stage2').classList.add('hidden');
-        }
+  <div id="stage1">
+    <div class="label">Bot Name</div>
+    <div class="field"><i class="fas fa-robot"></i><input type="text" id="userIdInput" placeholder="e.g. MyBot1 (any unique name)"></div>
+    <div class="label">WhatsApp Number</div>
+    <div class="field"><i class="fas fa-phone"></i><input type="tel" id="pairNumber" placeholder="92342758xxxxx" inputmode="numeric"></div>
+    <div class="hint"><i class="fas fa-lightbulb"></i> Include your country code, for example 92 for Pakistan. No + sign.</div>
+    <button class="btn" id="pairBtn"><i class="fas fa-key"></i> Generate Pair Code</button>
+    <div class="codebox" id="codebox">
+      <div class="bar" id="bar"><span id="barFill"></span></div>
+      <div id="codeText">Your pairing code will appear here</div>
+    </div>
+  </div>
 
-        socket.on('total-active', (count) => {
-            document.getElementById('totalActive').innerText = count;
-        });
+  <div id="stage2" class="hidden">
+    <div class="card">
+      <div class="row">
+        <span class="badge" id="connectionStatus">DISCONNECTED</span>
+        <span id="activeBotName" style="font-weight:600"></span>
+        <button class="btn danger" id="logoutBtn" style="width:auto;padding:0 18px;margin-left:auto">Logout</button>
+      </div>
+    </div>
+    <div class="card">
+      <h5 style="margin-bottom:10px"><i class="fas fa-terminal"></i> Live Console</h5>
+      <div class="console" id="console"></div>
+    </div>
+    <div class="card">
+      <h5>✅ Bot connected!</h5>
+      <p>Open WhatsApp and send <b>.menu</b> to your own number to see all commands.</p>
+    </div>
+  </div>
 
-        socket.on('total-users', (count) => {
-            document.getElementById('totalUsers').innerText = count;
-        });
+  <div class="steps">
+    <div class="step"><div class="n">1</div><h6>Enter number</h6><p>Type your WhatsApp number with country code.</p></div>
+    <div class="step"><div class="n">2</div><h6>Get the code</h6><p>An 8-digit pairing code appears here in seconds.</p></div>
+    <div class="step"><div class="n">3</div><h6>Link device</h6><p>WhatsApp → Linked Devices → Link with phone number.</p></div>
+    <div class="step"><div class="n">4</div><h6>Type .menu</h6><p>Your bot is live 24/7. Enjoy all commands.</p></div>
+  </div>
 
-        socket.on('pairing-code', (code) => {
-            // Hide loading bar and show code
-            document.getElementById('progressContainer').style.display = 'none';
-            document.getElementById('pairingResult').innerText = "YOUR CODE: " + code;
-        });
+  <footer>Powered by <a href="https://whatsapp.com/channel/0029Vb8U1NiHrDZlqZZuqr1s" target="_blank" rel="noopener">HJ-HACKER</a></footer>
+</main>
 
-        socket.on('console', (log) => {
-            const consoleDiv = document.getElementById('console');
-            const entry = document.createElement('div');
-            entry.innerHTML = `[${log.timestamp}] ${log.message}`;
-            consoleDiv.appendChild(entry);
-            consoleDiv.scrollTop = consoleDiv.scrollHeight;
-        });
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script>
+  const socket = io();
+  let currentUserId = null, isPairing = false, barTimer = null;
+  const $ = (id) => document.getElementById(id);
 
-        socket.on('connection-status', (status) => {
-            const badge = document.getElementById('connectionStatus');
-            if (status.connected) {
-                badge.className = 'status-badge connected';
-                badge.innerText = 'CONNECTED';
-                document.getElementById('stage1').classList.add('hidden');
-                document.getElementById('stage2').classList.remove('hidden');
-                document.getElementById('progressContainer').style.display = 'none';
-            } else {
-                badge.className = 'status-badge disconnected';
-                badge.innerText = 'DISCONNECTED';
-            }
-        });
+  socket.on('total-active', (n) => $('totalActive').innerText = n);
+  socket.on('total-users', (n) => $('totalUsers').innerText = n);
 
-        let isPairing = false;
-        document.getElementById('pairBtn').onclick = () => {
-            if (isPairing) return;
-            const number = document.getElementById('pairNumber').value;
-            if (!number) return alert('Enter number');
-            
-            isPairing = true;
-            document.getElementById('pairBtn').disabled = true;
-            
-            // Show and animate loading bar
-            const progressContainer = document.getElementById('progressContainer');
-            const progressBar = document.getElementById('progressBar');
-            const pairingResult = document.getElementById('pairingResult');
-            
-            pairingResult.innerText = "";
-            progressContainer.style.display = 'block';
-            progressBar.style.width = '0%';
-            
-            // Simulate progress while waiting for socket response
-            let width = 0;
-            const interval = setInterval(() => {
-                if (width >= 90) {
-                    clearInterval(interval);
-                } else {
-                    width += 2;
-                    progressBar.style.width = width + '%';
-                }
-            }, 100);
+  function startBar(){ $('bar').style.display='block'; let w=0; $('barFill').style.width='0%';
+    barTimer=setInterval(()=>{ if(w<90){w+=2;$('barFill').style.width=w+'%';} },120); }
+  function stopBar(){ clearInterval(barTimer); $('bar').style.display='none'; }
 
-            socket.emit('pair-request', { userId: currentUserId, number });
-            
-            // Re-enable after 10 seconds or when code received
-            setTimeout(() => {
-                isPairing = false;
-                document.getElementById('pairBtn').disabled = false;
-            }, 10000);
-        };
+  function showCode(code){
+    stopBar(); isPairing=false; $('pairBtn').disabled=false;
+    $('codeText').innerHTML = `<div class="code">${code}</div><button class="copy" onclick="navigator.clipboard.writeText('${code.replace(/-/g,'')}');this.innerText='Copied!'">Copy code</button><div>WhatsApp → Linked Devices → Link with phone number</div>`;
+  }
+  socket.on('pairing-code', showCode);
+  socket.on('pairing-error', (m) => { stopBar(); isPairing=false; $('pairBtn').disabled=false; $('codeText').innerHTML = `<span style="color:var(--danger)">❌ ${m}. Please try again.</span>`; });
 
-        document.getElementById('logoutBtn').onclick = () => {
-            socket.emit('logout', currentUserId);
-        };
-    </script>
+  socket.on('console', (log) => {
+    const c=$('console'); const e=document.createElement('div'); e.textContent=`[${log.timestamp}] ${log.message}`; c.appendChild(e); c.scrollTop=c.scrollHeight;
+  });
+
+  socket.on('connection-status', (s) => {
+    const b=$('connectionStatus');
+    if (s.connected) { b.className='badge on'; b.innerText='CONNECTED'; $('stage1').classList.add('hidden'); $('stage2').classList.remove('hidden'); stopBar(); }
+    else { b.className='badge'; b.innerText='DISCONNECTED'; }
+  });
+
+  $('pairBtn').onclick = () => {
+    if (isPairing) return;
+    const number = $('pairNumber').value.replace(/\D/g,'');
+    let userId = $('userIdInput').value.trim() || number;
+    if (!number || number.length < 8) { $('codeText').innerHTML='<span style="color:var(--danger)">Enter a valid number with country code.</span>'; return; }
+    currentUserId = userId; $('activeBotName').innerText = 'Bot: ' + userId;
+    socket.emit('set-user', userId);
+    isPairing = true; $('pairBtn').disabled = true;
+    $('codeText').innerText = '⏳ Connecting to WhatsApp... please wait.'; startBar();
+    setTimeout(() => socket.emit('pair-request', { userId, number }), 400);
+    setTimeout(() => { if (isPairing) { isPairing=false; $('pairBtn').disabled=false; } }, 25000);
+  };
+
+  $('logoutBtn').onclick = () => { socket.emit('logout', currentUserId); $('stage2').classList.add('hidden'); $('stage1').classList.remove('hidden'); $('codeText').innerText='Your pairing code will appear here'; };
+</script>
 </body>
 </html>
