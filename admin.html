@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HJ-HACKER MD — Admin Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Admin Panel — HJ-HACKER MD</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -22,7 +22,7 @@
     --red: #ef4444;
     --yellow: #f59e0b;
   }
-  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; overflow-x: hidden; }
 
   /* ===== SIDEBAR ===== */
   .sidebar {
@@ -54,16 +54,18 @@
   .menu-item i { width: 20px; text-align: center; font-size: 15px; flex-shrink: 0; }
   .sidebar.closed .menu-item span { display: none; }
   .sidebar.closed .menu-item { justify-content: center; padding: 12px; }
-  .sidebar-footer { padding: 15px 10px; border-top: 1px solid var(--card-border); }
-  .toggle-btn {
+  .sidebar-footer { padding: 15px 10px; border-top: 1px solid var(--card-border); display: flex; flex-direction: column; gap: 8px; }
+  .toggle-btn, .logout-btn {
     width: 100%; padding: 10px; background: var(--card); border: 1px solid var(--card-border);
     border-radius: 10px; color: var(--muted); cursor: pointer; font-size: 14px;
   }
   .toggle-btn:hover { color: var(--text); }
+  .logout-btn { background: rgba(239,68,68,.1); border-color: rgba(239,68,68,.3); color: var(--red); }
+  .logout-btn:hover { background: rgba(239,68,68,.2); }
 
   /* ===== MAIN CONTENT ===== */
-  .main { flex: 1; margin-left: 260px; padding: 30px; transition: margin-left .3s ease; min-height: 100vh; }
-  .main.expanded { margin-left: 70px; }
+  .main { flex: 1; margin-left: 260px; padding: 30px; transition: margin-left .3s ease; min-height: 100vh; width: calc(100% - 260px); }
+  .main.expanded { margin-left: 70px; width: calc(100% - 70px); }
   .topbar {
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 30px; flex-wrap: wrap; gap: 15px;
@@ -80,8 +82,6 @@
   .btn-primary:hover { background: var(--accent2); }
   .btn-secondary { background: var(--card); color: var(--text); border: 1px solid var(--card-border); }
   .btn-secondary:hover { background: var(--card-border); }
-  .btn-danger { background: var(--red); color: #fff; }
-  .btn-danger:hover { opacity: .85; }
 
   /* ===== CARDS ===== */
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; margin-bottom: 30px; }
@@ -155,11 +155,11 @@
   .modal-content h3 { font-size: 18px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
   .modal-content h3 i { color: var(--accent); }
   .modal-content .sub { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
-  .modal-content textarea, .modal-content input {
+  .modal-content textarea {
     width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--card-border);
     background: var(--card); color: var(--text); font-family: inherit; font-size: 14px; margin-bottom: 14px;
+    min-height: 110px; resize: vertical;
   }
-  .modal-content textarea { min-height: 110px; resize: vertical; }
   .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
   .chat-log { background: var(--card); border-radius: 10px; padding: 14px; max-height: 320px; overflow-y: auto; font-size: 13px; margin-bottom: 14px; }
   .chat-log .msg { padding: 8px 12px; margin-bottom: 8px; border-radius: 8px; background: rgba(255,255,255,.03); border-left: 3px solid var(--accent); }
@@ -167,55 +167,37 @@
   .empty { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; }
   .hidden { display: none !important; }
 
-  /* ===== LOGIN ===== */
-  .login-wrap { display: flex; align-items: center; justify-content: center; min-height: 100vh; width: 100%; }
-  .login-card {
-    background: var(--card); border: 1px solid var(--card-border); border-radius: 18px;
-    padding: 40px; max-width: 400px; width: 100%; text-align: center;
-  }
-  .login-card .logo-big {
-    width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, var(--accent), var(--accent2));
-    display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 28px; color: #fff;
-  }
-  .login-card h2 { font-size: 22px; margin-bottom: 6px; }
-  .login-card p { color: var(--muted); font-size: 13px; margin-bottom: 22px; }
-  .login-card input {
-    width: 100%; padding: 13px 14px; border-radius: 10px; border: 1px solid var(--card-border);
-    background: var(--bg); color: var(--text); font-family: inherit; font-size: 14px; margin-bottom: 14px;
-  }
-  .login-card button {
-    width: 100%; padding: 13px; border-radius: 10px; border: none; background: var(--accent);
-    color: #fff; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
-  }
-  .login-card button:hover { background: var(--accent2); }
-
   /* ===== RESPONSIVE ===== */
   @media (max-width: 768px) {
     .sidebar { width: 70px; }
     .sidebar .menu-item span { display: none; }
     .sidebar .menu-item { justify-content: center; }
     .sidebar .title { display: none; }
-    .main { margin-left: 70px; padding: 20px; }
-    .stats-grid { grid-template-columns: 1fr; }
+    .main { margin-left: 70px; padding: 15px; width: calc(100% - 70px); }
+    .main.expanded { margin-left: 0; width: 100%; }
+    .sidebar.open-mobile { width: 240px; }
+    .sidebar.open-mobile .menu-item span { display: inline; }
+    .sidebar.open-mobile .menu-item { justify-content: flex-start; }
+    .sidebar.open-mobile .title { display: block; }
+    .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .stat-card { padding: 16px; gap: 12px; }
+    .stat-icon { width: 42px; height: 42px; font-size: 18px; }
+    .stat-info h3 { font-size: 20px; }
+    .table-wrap { overflow-x: auto; }
+    table { min-width: 620px; }
+    th, td { padding: 10px 12px; font-size: 12px; }
+    .topbar { flex-direction: column; align-items: flex-start; }
+    .topbar h1 { font-size: 20px; }
+    .topbar .actions { width: 100%; }
+    .btn { flex: 1; justify-content: center; }
+    .features-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 
-<!-- ===== LOGIN SCREEN ===== -->
-<div id="loginScreen" class="login-wrap">
-  <div class="login-card">
-    <div class="logo-big"><i class="fas fa-shield-halved"></i></div>
-    <h2>Admin Login</h2>
-    <p>Enter password to access the dashboard</p>
-    <input type="password" id="adminPass" placeholder="Password" autocomplete="off">
-    <button onclick="login()"><i class="fas fa-right-to-bracket"></i> Login</button>
-    <p id="loginError" style="color:var(--red);font-size:12px;margin-top:12px;"></p>
-  </div>
-</div>
-
 <!-- ===== ADMIN PANEL ===== -->
-<div id="adminPanel" class="hidden" style="display:flex;width:100%;">
+<div id="adminPanel" style="display:flex;width:100%;">
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
@@ -244,12 +226,13 @@
     </nav>
     <div class="sidebar-footer">
       <button class="toggle-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+      <button class="logout-btn" onclick="adminLogout()"><i class="fas fa-right-from-bracket"></i></button>
     </div>
   </aside>
 
   <!-- Main Content -->
   <main class="main" id="mainContent">
-    <!-- Dashboard Section -->
+    <!-- Dashboard -->
     <div id="dashboardSection">
       <div class="topbar">
         <h1><i class="fas fa-chart-line"></i> Dashboard</h1>
@@ -303,7 +286,7 @@
       </div>
     </div>
 
-    <!-- Users Section -->
+    <!-- Users -->
     <div id="usersSection" class="hidden">
       <div class="topbar">
         <h1><i class="fas fa-users"></i> Connected Users</h1>
@@ -336,26 +319,26 @@
       </div>
     </div>
 
-    <!-- Broadcast Section -->
+    <!-- Broadcast -->
     <div id="broadcastSection" class="hidden">
       <div class="topbar">
         <h1><i class="fas fa-bullhorn"></i> Broadcast Message</h1>
       </div>
-      <div class="feature-card" style="max-width:600px;">
+      <div class="feature-card" style="max-width:600px;cursor:default;">
         <div class="fc-icon"><i class="fas fa-paper-plane"></i></div>
         <h4>Send Message to All Users</h4>
         <p>This message will be sent to all connected users' bots.</p>
-        <textarea id="broadcastMsg" placeholder="Type your message here..." style="width:100%;min-height:120px;padding:12px;border-radius:10px;border:1px solid var(--card-border);background:var(--bg);color:var(--text);font-family:inherit;margin-top:10px;"></textarea>
+        <textarea id="broadcastMsg" placeholder="Type your message here..." style="width:100%;min-height:120px;padding:12px;border-radius:10px;border:1px solid var(--card-border);background:var(--bg);color:var(--text);font-family:inherit;margin-top:10px;resize:vertical;"></textarea>
         <button class="fc-btn" onclick="sendBroadcast()"><i class="fas fa-paper-plane"></i> Send Broadcast</button>
       </div>
     </div>
 
-    <!-- Chats Section -->
+    <!-- Chats -->
     <div id="chatsSection" class="hidden">
       <div class="topbar">
         <h1><i class="fas fa-comments"></i> Chat Logs</h1>
       </div>
-      <div class="feature-card">
+      <div class="feature-card" style="cursor:default;">
         <div class="fc-icon"><i class="fas fa-message"></i></div>
         <h4>View Chat Logs</h4>
         <p>Select a user from the Users section to view their chat logs.</p>
@@ -363,12 +346,12 @@
       </div>
     </div>
 
-    <!-- Export Section -->
+    <!-- Export -->
     <div id="exportSection" class="hidden">
       <div class="topbar">
         <h1><i class="fas fa-file-export"></i> Export Data</h1>
       </div>
-      <div class="feature-card" style="max-width:500px;">
+      <div class="feature-card" style="max-width:500px;cursor:default;">
         <div class="fc-icon"><i class="fas fa-file-csv"></i></div>
         <h4>Download Users CSV</h4>
         <p>Export all connected users' data (number, name, status, mode) as a CSV file.</p>
@@ -376,22 +359,22 @@
       </div>
     </div>
 
-    <!-- Settings Section -->
+    <!-- Settings -->
     <div id="settingsSection" class="hidden">
       <div class="topbar">
         <h1><i class="fas fa-gear"></i> Settings</h1>
       </div>
-      <div class="feature-card" style="max-width:500px;">
+      <div class="feature-card" style="max-width:500px;cursor:default;">
         <div class="fc-icon"><i class="fas fa-shield"></i></div>
         <h4>Admin Settings</h4>
-        <p>Admin password aur baaki settings yahan se manage karein.</p>
-        <p style="color:var(--muted);font-size:12px;margin-top:8px;">Password change karne ke liye <code>admin.html</code> mein <code>ADMIN_PASSWORD</code> edit karein.</p>
+        <p>Admin password Railway ke environment variable se manage hota hai.</p>
+        <p style="color:var(--muted);font-size:12px;margin-top:8px;">Password change karne ke liye Railway mein <code>ADMIN_PASSWORD</code> variable update karein.</p>
       </div>
     </div>
   </main>
 </div>
 
-<!-- ===== MODALS ===== -->
+<!-- ===== CHAT MODAL ===== -->
 <div id="chatModal" class="modal hidden">
   <div class="modal-content">
     <h3><i class="fas fa-comments"></i> Chat Logs — <span id="chatUserName"></span></h3>
@@ -404,29 +387,26 @@
 
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 <script>
-  const socket = io();
-  let allUsers = [];
-  const ADMIN_PASSWORD = "HR1280857676";
-
-  function login() {
-    const pass = document.getElementById('adminPass').value;
-    if (pass === ADMIN_PASSWORD) {
-      document.getElementById('loginScreen').classList.add('hidden');
-      document.getElementById('adminPanel').classList.remove('hidden');
-      socket.emit('admin-join');
-    } else {
-      document.getElementById('loginError').innerText = "Wrong password!";
-    }
+  // ===== TOKEN CHECK =====
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get('token') || localStorage.getItem('adminToken');
+  if (!token) {
+    window.location.href = '/admin-login.html';
+    throw new Error('No token');
   }
-  document.getElementById('adminPass').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') login();
-  });
+
+  const socket = io({ auth: { token } });
+  let allUsers = [];
 
   function toggleSidebar() {
     const sb = document.getElementById('sidebar');
     const main = document.getElementById('mainContent');
-    sb.classList.toggle('closed');
-    main.classList.toggle('expanded');
+    if (window.innerWidth <= 768) {
+      sb.classList.toggle('open-mobile');
+    } else {
+      sb.classList.toggle('closed');
+      main.classList.toggle('expanded');
+    }
   }
 
   function showSection(name, el) {
@@ -437,9 +417,12 @@
     document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
     if (el) el.classList.add('active');
     else {
-      // Find menu item by name
-      const items = document.querySelectorAll('.menu-item');
-      items.forEach(m => { if (m.getAttribute('onclick')?.includes(name)) m.classList.add('active'); });
+      document.querySelectorAll('.menu-item').forEach(m => {
+        if (m.getAttribute('onclick')?.includes(name)) m.classList.add('active');
+      });
+    }
+    if (window.innerWidth <= 768) {
+      document.getElementById('sidebar').classList.remove('open-mobile');
     }
   }
 
@@ -462,8 +445,8 @@
     tbody.innerHTML = users.map((u, i) => `
       <tr>
         <td>${i + 1}</td>
-        <td>${u.number}</td>
-        <td>${u.name || '—'}</td>
+        <td>${u.displayNumber || u.number}</td>
+        <td>${u.name || 'Unknown'}</td>
         <td><span class="badge ${u.connected ? 'on' : 'off'}">${u.connected ? 'ONLINE' : 'OFFLINE'}</span></td>
         <td>${u.isPublic ? 'PUBLIC' : 'PRIVATE'}</td>
         <td>${u.sessionStart || '—'}</td>
@@ -477,7 +460,11 @@
 
   function filterTable() {
     const q = document.getElementById('searchInput').value.toLowerCase();
-    const filtered = allUsers.filter(u => u.number.includes(q) || (u.name && u.name.toLowerCase().includes(q)));
+    const filtered = allUsers.filter(u =>
+      u.number.includes(q) ||
+      (u.name && u.name.toLowerCase().includes(q)) ||
+      (u.displayNumber && u.displayNumber.includes(q))
+    );
     renderTable(filtered);
   }
 
@@ -502,7 +489,7 @@
     if (allUsers.length === 0) return alert('No users to export.');
     let csv = "Number,Name,Status,Mode,Session Start\n";
     allUsers.forEach(u => {
-      csv += `${u.number},${u.name || ''},${u.connected ? 'Online' : 'Offline'},${u.isPublic ? 'Public' : 'Private'},${u.sessionStart || ''}\n`;
+      csv += `"${u.displayNumber || u.number}","${u.name || ''}","${u.connected ? 'Online' : 'Offline'}","${u.isPublic ? 'Public' : 'Private'}","${u.sessionStart || ''}"\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -534,6 +521,26 @@
   function closeChat() {
     document.getElementById('chatModal').classList.add('hidden');
   }
+
+  async function adminLogout() {
+    if (!confirm('Logout admin panel?')) return;
+    try {
+      await fetch('/api/admin-logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+    } catch (e) {}
+    localStorage.removeItem('adminToken');
+    window.location.href = '/admin-login.html';
+  }
+
+  // Socket error handling
+  socket.on('connect_error', () => {
+    alert('Session expired. Please login again.');
+    localStorage.removeItem('adminToken');
+    window.location.href = '/admin-login.html';
+  });
 </script>
 </body>
 </html>
