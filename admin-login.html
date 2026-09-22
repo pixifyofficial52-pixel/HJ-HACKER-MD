@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Admin Login — HJ-HACKER MD</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #0a1628; color: #e6eef7; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .card { background: #12243d; border: 1px solid #1e3a5f; border-radius: 18px; padding: 40px 30px; max-width: 400px; width: 100%; text-align: center; }
+  .logo { width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, #3b82f6, #2563eb); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 28px; color: #fff; }
+  h2 { font-size: 22px; margin-bottom: 6px; }
+  p { color: #7d92ad; font-size: 13px; margin-bottom: 22px; }
+  input { width: 100%; padding: 13px 14px; border-radius: 10px; border: 1px solid #1e3a5f; background: #0a1628; color: #e6eef7; font-family: inherit; font-size: 14px; margin-bottom: 14px; outline: none; }
+  input:focus { border-color: #3b82f6; }
+  button { width: 100%; padding: 13px; border-radius: 10px; border: none; background: #3b82f6; color: #fff; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+  button:hover { background: #2563eb; }
+  button:disabled { opacity: .6; cursor: not-allowed; }
+  .error { color: #ef4444; font-size: 12px; margin-top: 12px; min-height: 16px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo"><i class="fas fa-shield-halved"></i></div>
+  <h2>Admin Login</h2>
+  <p>Enter password to access the dashboard</p>
+  <input type="password" id="pass" placeholder="Password" autocomplete="off">
+  <button id="loginBtn" onclick="login()"><i class="fas fa-right-to-bracket"></i> Login</button>
+  <div class="error" id="error"></div>
+</div>
+<script>
+  async function login() {
+    const pass = document.getElementById('pass').value;
+    const btn = document.getElementById('loginBtn');
+    const err = document.getElementById('error');
+    if (!pass) { err.innerText = 'Password likhein'; return; }
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+    try {
+      const res = await fetch('/api/admin-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pass })
+      });
+      const data = await res.json();
+      if (data.success) {
+        localStorage.setItem('adminToken', data.token);
+        window.location.href = '/admin?token=' + data.token;
+      } else {
+        err.innerText = 'Wrong password!';
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-right-to-bracket"></i> Login';
+      }
+    } catch (e) {
+      err.innerText = 'Server error. Try again.';
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-right-to-bracket"></i> Login';
+    }
+  }
+  document.getElementById('pass').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') login();
+  });
+</script>
+</body>
+</html>
