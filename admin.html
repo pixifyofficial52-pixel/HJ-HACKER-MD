@@ -4,111 +4,401 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HJ-HACKER MD — Admin Panel</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Poppins', sans-serif; background: #0b2a24; color: #f1f7f4; min-height: 100vh; padding: 20px; }
-  .header { max-width: 1200px; margin: 0 auto 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-  .header h1 { font-size: 1.4rem; color: #c7f55a; }
-  .stats { display: flex; gap: 12px; flex-wrap: wrap; }
-  .stat-box { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14); border-radius: 12px; padding: 12px 20px; text-align: center; min-width: 100px; }
-  .stat-box b { display: block; font-size: 1.6rem; color: #c7f55a; }
-  .stat-box span { font-size: .8rem; color: #b7cfc5; }
-  .toolbar { max-width: 1200px; margin: 0 auto 15px; display: flex; gap: 10px; flex-wrap: wrap; }
-  .toolbar input { flex: 1; min-width: 200px; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,.2); background: rgba(0,0,0,.2); color: #fff; font-family: inherit; }
-  .toolbar button { padding: 10px 18px; border-radius: 10px; border: none; background: #c7f55a; color: #0b2a24; font-weight: 600; cursor: pointer; font-family: inherit; }
-  .toolbar button:hover { opacity: .85; }
-  .toolbar button.secondary { background: rgba(255,255,255,.1); color: #fff; }
-  table { width: 100%; max-width: 1200px; margin: 0 auto; border-collapse: collapse; background: rgba(255,255,255,.05); border-radius: 12px; overflow: hidden; }
-  th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid rgba(255,255,255,.08); font-size: .85rem; }
-  th { background: rgba(199,245,90,.12); color: #c7f55a; font-weight: 600; }
-  tr:hover { background: rgba(255,255,255,.04); }
-  .badge { padding: 4px 10px; border-radius: 20px; font-size: .7rem; font-weight: 600; }
-  .badge.on { background: #3ddc84; color: #052; }
-  .badge.off { background: #ff5d5d; color: #fff; }
-  .btn-sm { padding: 5px 12px; border-radius: 8px; border: none; cursor: pointer; font-size: .75rem; font-weight: 600; margin-right: 4px; }
-  .btn-view { background: #4a9eff; color: #fff; }
-  .btn-logout { background: #ff5d5d; color: #fff; }
-  .login { max-width: 400px; margin: 100px auto; background: rgba(255,255,255,.07); border-radius: 16px; padding: 30px; text-align: center; }
-  .login input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,.2); background: rgba(0,0,0,.2); color: #fff; font-family: inherit; margin: 10px 0; }
-  .login button { width: 100%; padding: 12px; border-radius: 10px; border: none; background: #c7f55a; color: #0b2a24; font-weight: 700; cursor: pointer; }
+  :root {
+    --bg: #0a1628;
+    --bg2: #0f1f33;
+    --sidebar: #0d1a2b;
+    --card: #12243d;
+    --card-border: #1e3a5f;
+    --text: #e6eef7;
+    --muted: #7d92ad;
+    --accent: #3b82f6;
+    --accent2: #2563eb;
+    --green: #10b981;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+  }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    width: 260px; background: var(--sidebar); border-right: 1px solid var(--card-border);
+    height: 100vh; position: fixed; top: 0; left: 0; z-index: 100;
+    display: flex; flex-direction: column; transition: width .3s ease;
+    overflow: hidden;
+  }
+  .sidebar.closed { width: 70px; }
+  .sidebar-header {
+    padding: 20px 18px; display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid var(--card-border); min-height: 72px;
+  }
+  .sidebar-header .logo {
+    width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .sidebar-header .logo i { color: #fff; font-size: 16px; }
+  .sidebar-header .title { font-weight: 700; font-size: 15px; white-space: nowrap; }
+  .sidebar.closed .sidebar-header .title { display: none; }
+  .sidebar-menu { flex: 1; padding: 15px 10px; overflow-y: auto; }
+  .menu-item {
+    display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 10px;
+    color: var(--muted); cursor: pointer; margin-bottom: 4px; transition: all .2s;
+    white-space: nowrap; font-size: 14px; font-weight: 500;
+  }
+  .menu-item:hover { background: rgba(59,130,246,.1); color: var(--text); }
+  .menu-item.active { background: rgba(59,130,246,.15); color: var(--accent); }
+  .menu-item i { width: 20px; text-align: center; font-size: 15px; flex-shrink: 0; }
+  .sidebar.closed .menu-item span { display: none; }
+  .sidebar.closed .menu-item { justify-content: center; padding: 12px; }
+  .sidebar-footer { padding: 15px 10px; border-top: 1px solid var(--card-border); }
+  .toggle-btn {
+    width: 100%; padding: 10px; background: var(--card); border: 1px solid var(--card-border);
+    border-radius: 10px; color: var(--muted); cursor: pointer; font-size: 14px;
+  }
+  .toggle-btn:hover { color: var(--text); }
+
+  /* ===== MAIN CONTENT ===== */
+  .main { flex: 1; margin-left: 260px; padding: 30px; transition: margin-left .3s ease; min-height: 100vh; }
+  .main.expanded { margin-left: 70px; }
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 30px; flex-wrap: wrap; gap: 15px;
+  }
+  .topbar h1 { font-size: 24px; font-weight: 700; }
+  .topbar h1 i { color: var(--accent); margin-right: 10px; }
+  .topbar .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn {
+    padding: 10px 18px; border-radius: 10px; border: none; cursor: pointer;
+    font-family: inherit; font-size: 13px; font-weight: 600; display: inline-flex;
+    align-items: center; gap: 8px; transition: all .2s;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-secondary { background: var(--card); color: var(--text); border: 1px solid var(--card-border); }
+  .btn-secondary:hover { background: var(--card-border); }
+  .btn-danger { background: var(--red); color: #fff; }
+  .btn-danger:hover { opacity: .85; }
+
+  /* ===== CARDS ===== */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; margin-bottom: 30px; }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 14px;
+    padding: 22px; display: flex; align-items: center; gap: 18px;
+  }
+  .stat-icon {
+    width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center;
+    justify-content: center; font-size: 22px; flex-shrink: 0;
+  }
+  .stat-icon.blue { background: rgba(59,130,246,.15); color: var(--accent); }
+  .stat-icon.green { background: rgba(16,185,129,.15); color: var(--green); }
+  .stat-icon.yellow { background: rgba(245,158,11,.15); color: var(--yellow); }
+  .stat-icon.red { background: rgba(239,68,68,.15); color: var(--red); }
+  .stat-info h3 { font-size: 26px; font-weight: 700; }
+  .stat-info p { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+  /* ===== FEATURE CARDS ===== */
+  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+  .feature-card {
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 14px;
+    padding: 24px; display: flex; flex-direction: column; gap: 12px; cursor: pointer;
+    transition: all .2s;
+  }
+  .feature-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .feature-card .fc-icon {
+    width: 48px; height: 48px; border-radius: 12px; background: rgba(59,130,246,.15);
+    color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .feature-card h4 { font-size: 16px; font-weight: 600; }
+  .feature-card p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .feature-card .fc-btn {
+    margin-top: 8px; padding: 9px 16px; border-radius: 9px; border: none;
+    background: var(--accent); color: #fff; font-family: inherit; font-size: 13px;
+    font-weight: 600; cursor: pointer; align-self: flex-start;
+  }
+  .feature-card .fc-btn:hover { background: var(--accent2); }
+
+  /* ===== TABLE ===== */
+  .table-wrap { background: var(--card); border: 1px solid var(--card-border); border-radius: 14px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 14px 16px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--card-border); }
+  th { background: rgba(59,130,246,.08); color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: .5px; }
+  tr:hover { background: rgba(255,255,255,.02); }
+  .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge.on { background: rgba(16,185,129,.15); color: var(--green); }
+  .badge.off { background: rgba(239,68,68,.15); color: var(--red); }
+  .icon-btn {
+    width: 32px; height: 32px; border-radius: 8px; border: none; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; font-size: 13px; margin-right: 4px;
+  }
+  .icon-btn.view { background: rgba(59,130,246,.15); color: var(--accent); }
+  .icon-btn.del { background: rgba(239,68,68,.15); color: var(--red); }
+  .icon-btn:hover { opacity: .8; }
+
+  /* ===== SEARCH ===== */
+  .search-box {
+    display: flex; align-items: center; gap: 10px; background: var(--card);
+    border: 1px solid var(--card-border); border-radius: 10px; padding: 0 14px; height: 44px; margin-bottom: 18px;
+  }
+  .search-box i { color: var(--muted); }
+  .search-box input { flex: 1; background: none; border: none; outline: none; color: var(--text); font-family: inherit; font-size: 14px; }
+
+  /* ===== MODAL ===== */
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,.75); display: flex; align-items: center; justify-content: center; z-index: 200; padding: 20px; }
+  .modal-content {
+    background: var(--bg2); border: 1px solid var(--card-border); border-radius: 16px;
+    padding: 28px; max-width: 600px; width: 100%; max-height: 85vh; overflow-y: auto;
+  }
+  .modal-content h3 { font-size: 18px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+  .modal-content h3 i { color: var(--accent); }
+  .modal-content .sub { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+  .modal-content textarea, .modal-content input {
+    width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--card-border);
+    background: var(--card); color: var(--text); font-family: inherit; font-size: 14px; margin-bottom: 14px;
+  }
+  .modal-content textarea { min-height: 110px; resize: vertical; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+  .chat-log { background: var(--card); border-radius: 10px; padding: 14px; max-height: 320px; overflow-y: auto; font-size: 13px; margin-bottom: 14px; }
+  .chat-log .msg { padding: 8px 12px; margin-bottom: 8px; border-radius: 8px; background: rgba(255,255,255,.03); border-left: 3px solid var(--accent); }
+  .chat-log .msg .meta { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .empty { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; }
   .hidden { display: none !important; }
-  .empty { text-align: center; padding: 40px; color: #b7cfc5; }
-  .modal { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
-  .modal-content { background: #0e3a30; border-radius: 16px; padding: 25px; max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto; }
-  .modal-content h3 { color: #c7f55a; margin-bottom: 15px; }
-  .modal-content textarea { width: 100%; min-height: 100px; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,.2); background: rgba(0,0,0,.2); color: #fff; font-family: inherit; margin-bottom: 12px; }
-  .chat-log { background: rgba(0,0,0,.3); border-radius: 10px; padding: 12px; max-height: 300px; overflow-y: auto; font-size: .85rem; margin-bottom: 12px; }
-  .chat-log .msg { padding: 6px 10px; margin-bottom: 6px; border-radius: 8px; background: rgba(255,255,255,.05); }
-  .chat-log .msg .time { font-size: .7rem; color: #b7cfc5; }
-  .close-btn { background: #ff5d5d; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+
+  /* ===== LOGIN ===== */
+  .login-wrap { display: flex; align-items: center; justify-content: center; min-height: 100vh; width: 100%; }
+  .login-card {
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 18px;
+    padding: 40px; max-width: 400px; width: 100%; text-align: center;
+  }
+  .login-card .logo-big {
+    width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 28px; color: #fff;
+  }
+  .login-card h2 { font-size: 22px; margin-bottom: 6px; }
+  .login-card p { color: var(--muted); font-size: 13px; margin-bottom: 22px; }
+  .login-card input {
+    width: 100%; padding: 13px 14px; border-radius: 10px; border: 1px solid var(--card-border);
+    background: var(--bg); color: var(--text); font-family: inherit; font-size: 14px; margin-bottom: 14px;
+  }
+  .login-card button {
+    width: 100%; padding: 13px; border-radius: 10px; border: none; background: var(--accent);
+    color: #fff; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .login-card button:hover { background: var(--accent2); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .sidebar { width: 70px; }
+    .sidebar .menu-item span { display: none; }
+    .sidebar .menu-item { justify-content: center; }
+    .sidebar .title { display: none; }
+    .main { margin-left: 70px; padding: 20px; }
+    .stats-grid { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
 
-<!-- Login Screen -->
-<div id="loginScreen" class="login">
-  <h2 style="margin-bottom:10px;">🔐 Admin Login</h2>
-  <p style="color:#b7cfc5;font-size:.9rem;margin-bottom:15px;">Enter admin password to view connected users.</p>
-  <input type="password" id="adminPass" placeholder="Admin Password">
-  <button onclick="login()">Login</button>
-  <p id="loginError" style="color:#ff5d5d;font-size:.85rem;margin-top:10px;"></p>
+<!-- ===== LOGIN SCREEN ===== -->
+<div id="loginScreen" class="login-wrap">
+  <div class="login-card">
+    <div class="logo-big"><i class="fas fa-shield-halved"></i></div>
+    <h2>Admin Login</h2>
+    <p>Enter password to access the dashboard</p>
+    <input type="password" id="adminPass" placeholder="Password" autocomplete="off">
+    <button onclick="login()"><i class="fas fa-right-to-bracket"></i> Login</button>
+    <p id="loginError" style="color:var(--red);font-size:12px;margin-top:12px;"></p>
+  </div>
 </div>
 
-<!-- Admin Panel -->
-<div id="adminPanel" class="hidden">
-  <div class="header">
-    <h1><i class="fas fa-shield-halved"></i> Admin Panel — HJ-HACKER MD</h1>
-    <div class="stats">
-      <div class="stat-box"><b id="totalUsers">0</b><span>Total Users</span></div>
-      <div class="stat-box"><b id="activeUsers">0</b><span>Active Bots</span></div>
-      <div class="stat-box"><b id="publicUsers">0</b><span>Public Mode</span></div>
+<!-- ===== ADMIN PANEL ===== -->
+<div id="adminPanel" class="hidden" style="display:flex;width:100%;">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo"><i class="fas fa-bolt"></i></div>
+      <div class="title">HJ-HACKER MD</div>
     </div>
-  </div>
+    <nav class="sidebar-menu">
+      <div class="menu-item active" onclick="showSection('dashboard', this)">
+        <i class="fas fa-chart-line"></i><span>Dashboard</span>
+      </div>
+      <div class="menu-item" onclick="showSection('users', this)">
+        <i class="fas fa-users"></i><span>Connected Users</span>
+      </div>
+      <div class="menu-item" onclick="showSection('broadcast', this)">
+        <i class="fas fa-bullhorn"></i><span>Broadcast</span>
+      </div>
+      <div class="menu-item" onclick="showSection('chats', this)">
+        <i class="fas fa-comments"></i><span>Chat Logs</span>
+      </div>
+      <div class="menu-item" onclick="showSection('export', this)">
+        <i class="fas fa-file-export"></i><span>Export Data</span>
+      </div>
+      <div class="menu-item" onclick="showSection('settings', this)">
+        <i class="fas fa-gear"></i><span>Settings</span>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="toggle-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    </div>
+  </aside>
 
-  <div class="toolbar">
-    <input type="text" id="searchInput" placeholder="🔍 Search by number or name..." oninput="filterTable()">
-    <button onclick="openBroadcast()"><i class="fas fa-bullhorn"></i> Broadcast Message</button>
-    <button class="secondary" onclick="exportCSV()"><i class="fas fa-download"></i> Export CSV</button>
-    <button class="secondary" onclick="refreshUsers()"><i class="fas fa-sync"></i> Refresh</button>
-  </div>
+  <!-- Main Content -->
+  <main class="main" id="mainContent">
+    <!-- Dashboard Section -->
+    <div id="dashboardSection">
+      <div class="topbar">
+        <h1><i class="fas fa-chart-line"></i> Dashboard</h1>
+        <div class="actions">
+          <button class="btn btn-secondary" onclick="refreshUsers()"><i class="fas fa-sync"></i> Refresh</button>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+          <div class="stat-info"><h3 id="totalUsers">0</h3><p>Total Users</p></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="fas fa-circle-check"></i></div>
+          <div class="stat-info"><h3 id="activeUsers">0</h3><p>Active Bots</p></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon yellow"><i class="fas fa-globe"></i></div>
+          <div class="stat-info"><h3 id="publicUsers">0</h3><p>Public Mode</p></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon red"><i class="fas fa-lock"></i></div>
+          <div class="stat-info"><h3 id="privateUsers">0</h3><p>Private Mode</p></div>
+        </div>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card" onclick="showSection('users')">
+          <div class="fc-icon"><i class="fas fa-users-gear"></i></div>
+          <h4>Manage Users</h4>
+          <p>View all connected users, their numbers, status, and manage their sessions.</p>
+          <button class="fc-btn">Open</button>
+        </div>
+        <div class="feature-card" onclick="showSection('broadcast')">
+          <div class="fc-icon"><i class="fas fa-bullhorn"></i></div>
+          <h4>Broadcast Message</h4>
+          <p>Send a message to all connected users' bots at once.</p>
+          <button class="fc-btn">Open</button>
+        </div>
+        <div class="feature-card" onclick="showSection('chats')">
+          <div class="fc-icon"><i class="fas fa-comments"></i></div>
+          <h4>Chat Logs</h4>
+          <p>View bot chat logs for each connected user.</p>
+          <button class="fc-btn">Open</button>
+        </div>
+        <div class="feature-card" onclick="showSection('export')">
+          <div class="fc-icon"><i class="fas fa-file-csv"></i></div>
+          <h4>Export Data</h4>
+          <p>Download all connected users' data as a CSV file.</p>
+          <button class="fc-btn">Open</button>
+        </div>
+      </div>
+    </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>WhatsApp Number</th>
-        <th>Name</th>
-        <th>Status</th>
-        <th>Mode</th>
-        <th>Session Start</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody id="userTable">
-      <tr><td colspan="7" class="empty">Loading users...</td></tr>
-    </tbody>
-  </table>
+    <!-- Users Section -->
+    <div id="usersSection" class="hidden">
+      <div class="topbar">
+        <h1><i class="fas fa-users"></i> Connected Users</h1>
+        <div class="actions">
+          <button class="btn btn-secondary" onclick="refreshUsers()"><i class="fas fa-sync"></i> Refresh</button>
+          <button class="btn btn-primary" onclick="exportCSV()"><i class="fas fa-download"></i> Export CSV</button>
+        </div>
+      </div>
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search by number or name..." oninput="filterTable()">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>WhatsApp Number</th>
+              <th>Name</th>
+              <th>Status</th>
+              <th>Mode</th>
+              <th>Session Start</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userTable">
+            <tr><td colspan="7" class="empty">Loading users...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Broadcast Section -->
+    <div id="broadcastSection" class="hidden">
+      <div class="topbar">
+        <h1><i class="fas fa-bullhorn"></i> Broadcast Message</h1>
+      </div>
+      <div class="feature-card" style="max-width:600px;">
+        <div class="fc-icon"><i class="fas fa-paper-plane"></i></div>
+        <h4>Send Message to All Users</h4>
+        <p>This message will be sent to all connected users' bots.</p>
+        <textarea id="broadcastMsg" placeholder="Type your message here..." style="width:100%;min-height:120px;padding:12px;border-radius:10px;border:1px solid var(--card-border);background:var(--bg);color:var(--text);font-family:inherit;margin-top:10px;"></textarea>
+        <button class="fc-btn" onclick="sendBroadcast()"><i class="fas fa-paper-plane"></i> Send Broadcast</button>
+      </div>
+    </div>
+
+    <!-- Chats Section -->
+    <div id="chatsSection" class="hidden">
+      <div class="topbar">
+        <h1><i class="fas fa-comments"></i> Chat Logs</h1>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon"><i class="fas fa-message"></i></div>
+        <h4>View Chat Logs</h4>
+        <p>Select a user from the Users section to view their chat logs.</p>
+        <button class="fc-btn" onclick="showSection('users')"><i class="fas fa-arrow-right"></i> Go to Users</button>
+      </div>
+    </div>
+
+    <!-- Export Section -->
+    <div id="exportSection" class="hidden">
+      <div class="topbar">
+        <h1><i class="fas fa-file-export"></i> Export Data</h1>
+      </div>
+      <div class="feature-card" style="max-width:500px;">
+        <div class="fc-icon"><i class="fas fa-file-csv"></i></div>
+        <h4>Download Users CSV</h4>
+        <p>Export all connected users' data (number, name, status, mode) as a CSV file.</p>
+        <button class="fc-btn" onclick="exportCSV()"><i class="fas fa-download"></i> Download CSV</button>
+      </div>
+    </div>
+
+    <!-- Settings Section -->
+    <div id="settingsSection" class="hidden">
+      <div class="topbar">
+        <h1><i class="fas fa-gear"></i> Settings</h1>
+      </div>
+      <div class="feature-card" style="max-width:500px;">
+        <div class="fc-icon"><i class="fas fa-shield"></i></div>
+        <h4>Admin Settings</h4>
+        <p>Admin password aur baaki settings yahan se manage karein.</p>
+        <p style="color:var(--muted);font-size:12px;margin-top:8px;">Password change karne ke liye <code>admin.html</code> mein <code>ADMIN_PASSWORD</code> edit karein.</p>
+      </div>
+    </div>
+  </main>
 </div>
 
-<!-- Broadcast Modal -->
-<div id="broadcastModal" class="modal hidden">
-  <div class="modal-content">
-    <h3><i class="fas fa-bullhorn"></i> Broadcast Message</h3>
-    <p style="color:#b7cfc5;font-size:.85rem;margin-bottom:10px;">This message will be sent to all connected users' bots.</p>
-    <textarea id="broadcastMsg" placeholder="Type your message here..."></textarea>
-    <button onclick="sendBroadcast()" style="background:#c7f55a;color:#0b2a24;padding:10px 20px;border:none;border-radius:10px;font-weight:600;cursor:pointer;margin-right:8px;">Send</button>
-    <button class="close-btn" onclick="closeBroadcast()">Cancel</button>
-  </div>
-</div>
-
-<!-- Chat Logs Modal -->
+<!-- ===== MODALS ===== -->
 <div id="chatModal" class="modal hidden">
   <div class="modal-content">
-    <h3><i class="fas fa-comments"></i> Bot Chat Logs — <span id="chatUserName"></span></h3>
+    <h3><i class="fas fa-comments"></i> Chat Logs — <span id="chatUserName"></span></h3>
     <div class="chat-log" id="chatLogContent">Loading...</div>
-    <button class="close-btn" onclick="closeChat()">Close</button>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeChat()">Close</button>
+    </div>
   </div>
 </div>
 
@@ -125,7 +415,31 @@
       document.getElementById('adminPanel').classList.remove('hidden');
       socket.emit('admin-join');
     } else {
-      document.getElementById('loginError').innerText = "❌ Wrong password!";
+      document.getElementById('loginError').innerText = "Wrong password!";
+    }
+  }
+  document.getElementById('adminPass').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') login();
+  });
+
+  function toggleSidebar() {
+    const sb = document.getElementById('sidebar');
+    const main = document.getElementById('mainContent');
+    sb.classList.toggle('closed');
+    main.classList.toggle('expanded');
+  }
+
+  function showSection(name, el) {
+    ['dashboard', 'users', 'broadcast', 'chats', 'export', 'settings'].forEach(s => {
+      document.getElementById(s + 'Section').classList.add('hidden');
+    });
+    document.getElementById(name + 'Section').classList.remove('hidden');
+    document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+    if (el) el.classList.add('active');
+    else {
+      // Find menu item by name
+      const items = document.querySelectorAll('.menu-item');
+      items.forEach(m => { if (m.getAttribute('onclick')?.includes(name)) m.classList.add('active'); });
     }
   }
 
@@ -133,7 +447,9 @@
     allUsers = data.users || [];
     document.getElementById('totalUsers').innerText = data.total || 0;
     document.getElementById('activeUsers').innerText = data.active || 0;
-    document.getElementById('publicUsers').innerText = allUsers.filter(u => u.isPublic).length;
+    const pub = allUsers.filter(u => u.isPublic).length;
+    document.getElementById('publicUsers').innerText = pub;
+    document.getElementById('privateUsers').innerText = allUsers.length - pub;
     renderTable(allUsers);
   });
 
@@ -149,11 +465,11 @@
         <td>${u.number}</td>
         <td>${u.name || '—'}</td>
         <td><span class="badge ${u.connected ? 'on' : 'off'}">${u.connected ? 'ONLINE' : 'OFFLINE'}</span></td>
-        <td>${u.isPublic ? 'PUBLIC 🌐' : 'PRIVATE 🔒'}</td>
+        <td>${u.isPublic ? 'PUBLIC' : 'PRIVATE'}</td>
         <td>${u.sessionStart || '—'}</td>
         <td>
-          <button class="btn-sm btn-view" onclick="viewChat('${u.number}')"><i class="fas fa-eye"></i></button>
-          <button class="btn-sm btn-logout" onclick="logoutUser('${u.number}')"><i class="fas fa-sign-out-alt"></i></button>
+          <button class="icon-btn view" onclick="viewChat('${u.number}')" title="View Chat"><i class="fas fa-eye"></i></button>
+          <button class="icon-btn del" onclick="logoutUser('${u.number}')" title="Logout"><i class="fas fa-right-from-bracket"></i></button>
         </td>
       </tr>
     `).join('');
@@ -161,15 +477,11 @@
 
   function filterTable() {
     const q = document.getElementById('searchInput').value.toLowerCase();
-    const filtered = allUsers.filter(u => 
-      u.number.includes(q) || (u.name && u.name.toLowerCase().includes(q))
-    );
+    const filtered = allUsers.filter(u => u.number.includes(q) || (u.name && u.name.toLowerCase().includes(q)));
     renderTable(filtered);
   }
 
-  function refreshUsers() {
-    socket.emit('admin-join');
-  }
+  function refreshUsers() { socket.emit('admin-join'); }
 
   function logoutUser(userId) {
     if (confirm(`Logout user ${userId}?`)) {
@@ -178,19 +490,12 @@
     }
   }
 
-  function openBroadcast() {
-    document.getElementById('broadcastModal').classList.remove('hidden');
-  }
-  function closeBroadcast() {
-    document.getElementById('broadcastModal').classList.add('hidden');
-    document.getElementById('broadcastMsg').value = '';
-  }
   function sendBroadcast() {
     const msg = document.getElementById('broadcastMsg').value.trim();
     if (!msg) return alert('Message likhein!');
     socket.emit('admin-broadcast', msg);
-    alert('✅ Broadcast sent to all users!');
-    closeBroadcast();
+    alert('Broadcast sent to all users!');
+    document.getElementById('broadcastMsg').value = '';
   }
 
   function exportCSV() {
@@ -222,18 +527,13 @@
     el.innerHTML = data.logs.map(l => `
       <div class="msg">
         <b>${l.from}</b>: ${l.text}
-        <div class="time">${l.time}</div>
+        <div class="meta">${l.time}</div>
       </div>
     `).join('');
   });
   function closeChat() {
     document.getElementById('chatModal').classList.add('hidden');
   }
-
-  // Enter key se login
-  document.getElementById('adminPass').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') login();
-  });
 </script>
 </body>
 </html>
