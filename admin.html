@@ -28,7 +28,7 @@
   .sidebar {
     width: 260px; background: var(--sidebar); border-right: 1px solid var(--card-border);
     height: 100vh; position: fixed; top: 0; left: 0; z-index: 100;
-    display: flex; flex-direction: column; transition: transform .3s ease, width .3s ease;
+    display: flex; flex-direction: column; transition: transform .3s ease;
     overflow: hidden;
   }
   .sidebar.collapsed {
@@ -64,7 +64,7 @@
   .main { flex: 1; margin-left: 260px; padding: 30px; transition: margin-left .3s ease; min-height: 100vh; width: calc(100% - 260px); }
   .main.expanded { margin-left: 0; width: 100%; }
 
-  /* ===== TOPBAR WITH MENU BUTTON ===== */
+  /* ===== TOPBAR ===== */
   .topbar {
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 30px; flex-wrap: wrap; gap: 15px;
@@ -465,8 +465,8 @@
         <td>${u.isPublic ? 'PUBLIC' : 'PRIVATE'}</td>
         <td>${u.sessionStart || '—'}</td>
         <td>
-          <button class="icon-btn view" onclick="viewChat('${u.number}')" title="View Chat"><i class="fas fa-eye"></i></button>
-          <button class="icon-btn del" onclick="logoutUser('${u.number}')" title="Logout"><i class="fas fa-right-from-bracket"></i></button>
+          <button class="icon-btn view" onclick="viewChat('${u.userId || u.number}')" title="View Chat"><i class="fas fa-eye"></i></button>
+          <button class="icon-btn del" onclick="logoutUser('${u.userId || u.number}')" title="Logout"><i class="fas fa-right-from-bracket"></i></button>
         </td>
       </tr>
     `).join('');
