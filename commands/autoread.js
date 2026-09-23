@@ -1,29 +1,17 @@
 /**
- * Arslan Bot - A WhatsApp Bot
- * Autoread Command - Automatically read all messages
+ * Autoread Command - Per User
+ * Har user ka apna autoread setting hai, jo botData mein save hoti hai.
+ * Yeh ensure karta hai ki ek user ki setting doosre user ke bot par apply na ho.
  */
 
-const fs = require('fs');
-const path = require('path');
+const { getChannelJid } = require('../lib/messageConfig');
 
-// Path to store the configuration
-const configPath = path.join(__dirname, '..', 'data', 'autoread.json');
-
-// Initialize configuration file if it doesn't exist
-function initConfig() {
-    if (!fs.existsSync(configPath)) {
-        if (!fs.existsSync(path.dirname(configPath))) {
-            fs.mkdirSync(path.dirname(configPath), { recursive: true });
-        }
-        fs.writeFileSync(configPath, JSON.stringify({ enabled: false }, null, 2));
-    }
-    return JSON.parse(fs.readFileSync(configPath));
-}
-
-// Toggle autoread feature
-async function autoreadCommand(sock, chatId, message) {
+// ============================================================
+// AUTOREAD COMMAND (Toggle ON/OFF)
+// ============================================================
+async function autoreadCommand(sock, chatId, message, userId, botData, saveBotData, args) {
     try {
-        // Only the person who connected the bot (isMe) can use this
+        // Sirf bot owner hi command use kar sakta hai
         if (!message.key.fromMe) {
             await sock.sendMessage(chatId, {
                 text: '❌ This command is only available for the owner!',
@@ -31,7 +19,7 @@ async function autoreadCommand(sock, chatId, message) {
                     forwardingScore: 1,
                     isForwarded: true,
                     forwardedNewsletterMessageInfo: {
-                        newsletterJid: require('../lib/messageConfig').getChannelJid(),
+                        newsletterJid: getChannelJid(),
                         newsletterName: 'HJ-HACKER MD',
                         serverMessageId: -1
                     }
@@ -40,58 +28,49 @@ async function autoreadCommand(sock, chatId, message) {
             return;
         }
 
-        // Get command arguments
-        const messageContent = message.message?.ephemeralMessage?.message || message.message?.viewOnceMessage?.message || message.message?.viewOnceMessageV2?.message || message.message;
-        const body = (messageContent?.conversation || messageContent?.extendedTextMessage?.text || messageContent?.imageMessage?.caption || messageContent?.videoMessage?.caption || '').trim();
-        const args = body.split(' ').slice(1);
-        
-        // Initialize or read config
-        const config = initConfig();
-        
-        // Toggle based on argument or toggle current state if no argument
-        if (args.length > 0) {
-            const action = args[0].toLowerCase();
-            if (action === 'on' || action === 'enable') {
-                config.enabled = true;
-            } else if (action === 'off' || action === 'disable') {
-                config.enabled = false;
-            } else {
-                await sock.sendMessage(chatId, {
-                    text: '❌ Invalid option! Use: .autoread on/off',
-                    contextInfo: {
-                        forwardingScore: 1,
-                        isForwarded: true,
-                        forwardedNewsletterMessageInfo: {
-                            newsletterJid: require('../lib/messageConfig').getChannelJid(),
-                            newsletterName: 'HJ-HACKER MD',
-                            serverMessageId: -1
-                        }
-                    }
-                });
-                return;
-            }
+        // Per-user setting initialize karein
+        if (!botData.autoread) botData.autoread = {};
+
+        const match = (args && args[0] ? args[0] : '').toLowerCase();
+
+        if (match === 'on' || match === 'enable') {
+            botData.autoread[userId] = true;
+        } else if (match === 'off' || match === 'disable') {
+            botData.autoread[userId] = false;
         } else {
-            // Toggle current state
-            config.enabled = !config.enabled;
+            // Agar koi argument nahi diya, toh current status dikhayein
+            await sock.sendMessage(chatId, {
+                text: `📖 *Autoread Status:* ${botData.autoread[userId] ? '✅ ON' : '❌ OFF'}\n\nUse: *.autoread on/off*`,
+                contextInfo: {
+                    forwardingScore: 1,
+                    isForwarded: true,
+                    forwardedNewsletterMessageInfo: {
+                        newsletterJid: getChannelJid(),
+                        newsletterName: 'HJ-HACKER MD',
+                        serverMessageId: -1
+                    }
+                }
+            });
+            return;
         }
-        
-        // Save updated configuration
-        fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
-        
-        // Send confirmation message
+
+        // Setting save karein
+        if (typeof saveBotData === 'function') saveBotData();
+
+        // Confirmation message
         await sock.sendMessage(chatId, {
-            text: `✅ Auto-read has been ${config.enabled ? 'enabled' : 'disabled'}!`,
+            text: `✅ Auto-read has been ${botData.autoread[userId] ? 'enabled' : 'disabled'} for your bot!`,
             contextInfo: {
                 forwardingScore: 1,
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
-                    newsletterJid: require('../lib/messageConfig').getChannelJid(),
+                    newsletterJid: getChannelJid(),
                     newsletterName: 'HJ-HACKER MD',
                     serverMessageId: -1
                 }
             }
         });
-        
+
     } catch (error) {
         console.error('Error in autoread command:', error);
         await sock.sendMessage(chatId, {
@@ -100,7 +79,7 @@ async function autoreadCommand(sock, chatId, message) {
                 forwardingScore: 1,
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
-                    newsletterJid: require('../lib/messageConfig').getChannelJid(),
+                    newsletterJid: getChannelJid(),
                     newsletterName: 'HJ-HACKER MD',
                     serverMessageId: -1
                 }
@@ -109,25 +88,25 @@ async function autoreadCommand(sock, chatId, message) {
     }
 }
 
-// Function to check if autoread is enabled
-function isAutoreadEnabled() {
+// ============================================================
+// CHECK IF AUTOREAD ENABLED (Per-User)
+// ============================================================
+function isAutoreadEnabled(userId, botData) {
     try {
-        const config = initConfig();
-        return config.enabled;
+        if (!botData || !botData.autoread) return false;
+        return !!botData.autoread[userId];
     } catch (error) {
         console.error('Error checking autoread status:', error);
         return false;
     }
 }
 
-// Function to handle autoread functionality
+// ============================================================
+// HANDLE AUTOREAD (Per-User)
+// ============================================================
 async function handleAutoread(sock, message, userId, botData) {
     try {
-        // Global autoread check (only if .autoread on was used)
-        const isGlobalEnabled = isAutoreadEnabled();
-        
-        if (isGlobalEnabled) {
-            // Mark as read normally
+        if (isAutoreadEnabled(userId, botData)) {
             await sock.readMessages([message.key]);
             return true;
         }
@@ -137,6 +116,9 @@ async function handleAutoread(sock, message, userId, botData) {
     return false;
 }
 
+// ============================================================
+// EXPORTS
+// ============================================================
 module.exports = {
     autoreadCommand,
     isAutoreadEnabled,
