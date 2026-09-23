@@ -4,8 +4,7 @@ const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
 const { writeFile } = require('fs/promises');
 
 const messageStore = new Map();
-const MAX_STORE_SIZE = 1000; // Limit in-memory messages to prevent crashes
-const CONFIG_PATH = path.join(__dirname, '../data/antidelete.json');
+const MAX_STORE_SIZE = 1000;
 const TEMP_MEDIA_DIR = path.join(__dirname, '../tmp');
 
 const toBold = (text) => {
@@ -17,12 +16,10 @@ const toBold = (text) => {
     return text.split('').map(c => boldChars[c] || c).join('');
 };
 
-// Ensure tmp dir exists
 if (!fs.existsSync(TEMP_MEDIA_DIR)) {
     fs.mkdirSync(TEMP_MEDIA_DIR, { recursive: true });
 }
 
-// Function to get folder size in MB
 const getFolderSizeInMB = (folderPath) => {
     try {
         const files = fs.readdirSync(folderPath);
@@ -39,7 +36,6 @@ const getFolderSizeInMB = (folderPath) => {
     }
 };
 
-// Function to clean temp folder if size exceeds 100MB
 const cleanTempFolderIfLarge = () => {
     try {
         if (getFolderSizeInMB(TEMP_MEDIA_DIR) > 100) {
@@ -53,29 +49,27 @@ const cleanTempFolderIfLarge = () => {
 
 setInterval(cleanTempFolderIfLarge, 60 * 1000);
 
-function loadAntideleteConfig() {
-    try {
-        if (!fs.existsSync(CONFIG_PATH)) return { enabled: false };
-        return JSON.parse(fs.readFileSync(CONFIG_PATH));
-    } catch {
-        return { enabled: false };
-    }
+// ============================================================
+// PER-USER SETTING CHECK
+// ============================================================
+function isAntideleteEnabled(userId, botData) {
+    if (!botData || !botData.antiDelete) return false;
+    return !!botData.antiDelete[userId];
 }
 
-function saveAntideleteConfig(config) {
-    try {
-        fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2));
-    } catch (err) {}
-}
-
+// ============================================================
+// ANTIDELETE COMMAND
+// ============================================================
 async function handleAntideleteCommand(sock, chatId, message, isAdmin, botData, saveBotData, userId, args) {
-    const config = loadAntideleteConfig();
+    if (!botData.antiDelete) botData.antiDelete = {};
+    
     const match = args[0]?.toLowerCase();
+    const currentStatus = isAntideleteEnabled(userId, botData);
 
     if (!match) {
         return sock.sendMessage(chatId, {
             text: `╭━━━〔 ${toBold("ANTI-DELETE SETUP")} 〕━━━┈⊷\n` +
-                   `┃ ⋄ ${toBold("Status:")} ${config.enabled ? '✅ Enabled' : '❌ Disabled'}\n` +
+                   `┃ ⋄ ${toBold("Status:")} ${currentStatus ? '✅ Enabled' : '❌ Disabled'}\n` +
                    `┃\n` +
                    `┃ ⋄ ${toBold(".antidelete on")} - Enable\n` +
                    `┃ ⋄ ${toBold(".antidelete off")} - Disable\n` +
@@ -84,31 +78,29 @@ async function handleAntideleteCommand(sock, chatId, message, isAdmin, botData, 
     }
 
     if (match === 'on') {
-        config.enabled = true;
+        botData.antiDelete[userId] = true;
     } else if (match === 'off') {
-        config.enabled = false;
+        botData.antiDelete[userId] = false;
     } else {
         return sock.sendMessage(chatId, { text: '*Invalid command. Use .antidelete to see usage.*' }, {quoted:message});
     }
 
-    saveAntideleteConfig(config);
+    if (typeof saveBotData === 'function') saveBotData();
 
-    // ✅ FIX: botData ko bhi sync karein taaki menu mein ✅ dikhe
-    if (botData) {
-        if (!botData.antiDelete) botData.antiDelete = {};
-        botData.antiDelete[userId] = config.enabled;
-        if (saveBotData) saveBotData();
-    }
-
-    return sock.sendMessage(chatId, { text: `*Antidelete ${match === 'on' ? 'enabled' : 'disabled'}*` }, {quoted:message});
+    return sock.sendMessage(chatId, { 
+        text: `*Antidelete ${match === 'on' ? 'enabled' : 'disabled'} for your bot*` 
+    }, {quoted:message});
 }
 
-async function storeMessage(message) {
+// ============================================================
+// STORE MESSAGE (Per-User)
+// ============================================================
+async function storeMessage(message, userId, botData) {
     try {
-        const config = loadAntideleteConfig();
-        if (!config.enabled || !message.key?.id) return;
+        if (!isAntideleteEnabled(userId, botData)) return;
+        if (!message.key?.id) return;
 
-        const messageId = message.key.id;
+        const messageId = `${userId}_${message.key.id}`; // 👈 userId ke saath unique
         let content = '';
         let mediaType = '';
         let mediaPath = '';
@@ -157,7 +149,6 @@ async function storeMessage(message) {
             } catch (e) { console.error('Antidelete download error:', e); }
         }
 
-        // Prune old messages if store is too large
         if (messageStore.size >= MAX_STORE_SIZE) {
             const firstKey = messageStore.keys().next().value;
             messageStore.delete(firstKey);
@@ -168,18 +159,22 @@ async function storeMessage(message) {
             mediaType,
             mediaPath,
             sender,
+            userId, // 👈 userId store karein
             group: message.key.remoteJid.endsWith('@g.us') ? message.key.remoteJid : null,
             timestamp: new Date().toISOString()
         });
     } catch (err) {}
 }
 
-async function handleMessageRevocation(sock, revocationMessage) {
+// ============================================================
+// HANDLE MESSAGE REVOCATION (Per-User)
+// ============================================================
+async function handleMessageRevocation(sock, revocationMessage, userId, botData) {
     try {
-        const config = loadAntideleteConfig();
-        if (!config.enabled) return;
+        if (!isAntideleteEnabled(userId, botData)) return;
 
-        const messageId = revocationMessage.message.protocolMessage.key.id;
+        const rawMessageId = revocationMessage.message.protocolMessage.key.id;
+        const messageId = `${userId}_${rawMessageId}`; // 👈 userId ke saath match karein
         const deletedBy = revocationMessage.participant || revocationMessage.key.participant || revocationMessage.key.remoteJid;
         const ownerNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net';
 
@@ -211,7 +206,6 @@ async function handleMessageRevocation(sock, revocationMessage) {
             else if (original.mediaType === 'video') await sock.sendMessage(ownerNumber, { video: { url: original.mediaPath }, ...mediaOptions });
             else if (original.mediaType === 'audio') await sock.sendMessage(ownerNumber, { audio: { url: original.mediaPath }, mimetype: 'audio/mp4', ...mediaOptions });
             
-            // Delete file after sending
             setTimeout(() => {
                 try { if (fs.existsSync(original.mediaPath)) fs.unlinkSync(original.mediaPath); } catch (err) {}
             }, 5000);
